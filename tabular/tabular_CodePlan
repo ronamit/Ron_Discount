@@ -2,17 +2,20 @@
 
 ###############  main   ##################
 # * M := GenerateMDP
-# * FindOptimalPolicy (for M, gammaEval)
-# * calculate  average over states true-value for optimal policy , with gammaEval(first term in eq. 14) (use PolicyEvaluation)
+
 # * Set a fixed exploration policy pi (e.g a uniform over actions)
 # * D := Sample N trajectories with depth T (use SampleTrajectories)
-# *  USe PolicyEvaluation to get V^pi[M,gammaEval]
+# *  USe PolicyEvaluation to get V^pi[M,gammaEval] (true value function)
 # * Use 2 methods for estimation:
 #   1. Model-based - estimate M_hat from D and do PolicyEvaluation
 #   2. Model-free TD-learning  using D
 
 # Next phase:
 # 1. Plot performance vs guidance-gamma for different N
+
+2.  Recreate Jiang experiment
+# * FindOptimalPolicy (for M, gammaEval)
+# * calculate  average over states true-value for optimal policy , with gammaEval(first term in eq. 14) (use PolicyEvaluation)
 
 
 ###############  subroutines   ##################
