@@ -30,7 +30,7 @@ def GenerateMDP(S, A, k):
     return P, R
 
 #------------------------------------------------------------------------------------------------------------~
-def SampleTrajectories(P, R, pi, n, depth, p0=None):
+def SampleTrajectories(P, R, pi, n, depth, p0=None, reward_std=0.1):
     """
     # generate n trajectories
 
@@ -43,26 +43,22 @@ def SampleTrajectories(P, R, pi, n, depth, p0=None):
     depth: Length of trajectory
     p0 (optional) [S] matrix of initial state distribution (default:  uniform)
     Returns:
-    data: list of n trajectories, each is a list of sequence of depth tuples (state, action, reward, next - state)
+    data: list of n trajectories, each is a list of sequence of depth tuples (state, action, reward, next state)
     """
     S = P.shape[0]
-    A =  P.shape[1]
+    A = P.shape[1]
     if p0 is None:
         p0 = np.ones(S) / S #  uniform
     data = []
     for i_traj in range(n):
         data.append([])
         # sample initial state:
-        s = np.random.choice(S, size=1, p=p0)
+        s = np.random.choice(S, size=1, p=p0)[0]
         for t in range(depth):
             # Until t==depth, sample a~pi(.|s), s'~P(.|s,a), r~R(s,a)
-            a = np.random.choice(A, size=1, p=pi[s, :])
-            s_next = np.random.choice(A, size=1, p=P[s, a, :])
-            r
-            data[i_traj] =
+            a = np.random.choice(A, size=1, p=pi[s, :])[0]
+            s_next = np.random.choice(S, size=1, p=P[s, a, :])[0]
+            r = R[s,a]+ np.random.randn(1)[0] * reward_std
+            data[i_traj].append((s,a,r,s_next))
             s = s_next
-
-
-
-
-# subroutine: SampleTrajectories (see sampleTrajectories.m)
+    return data

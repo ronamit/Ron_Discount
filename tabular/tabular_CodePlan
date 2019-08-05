@@ -4,8 +4,8 @@
 # * M := GenerateMDP
 
 # * Set a fixed exploration policy pi (e.g a uniform over actions)
-# * D := Sample N trajectories with depth T (use SampleTrajectories)
 # *  USe PolicyEvaluation to get V^pi[M,gammaEval] (true value function)
+# * D := Sample N trajectories with depth T (use SampleTrajectories)
 # * Use 2 methods for estimation:
 #   1. Model-based - estimate M_hat from D and do PolicyEvaluation
 #   2. Model-free TD-learning  using D
