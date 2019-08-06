@@ -19,7 +19,7 @@ def GetUniformPolicy(N, A):
     return pi
 
 #------------------------------------------------------------------------------------------------------------~
-def GetPolicyDynamics(R, P, pi):
+def GetPolicyDynamics(P, R, pi):
     """
     Calculate the dynamics when following the policy pi
 
@@ -32,6 +32,8 @@ def GetPolicyDynamics(R, P, pi):
     P_pi: [S x S] transitions matrix  when following the policy pi      (P_pi)_{s,s'} P^pi(s'|s)
     R_pi: [S] mean rewards at each state when following the policy pi    (R_pi)_{s} = R^pi(s)
     """
+    if P.ndim != 3 or R.ndim != 2 or pi.ndim != 2:
+        raise ValueError('Invalid input')
     S = P.shape[0]
     A = P.shape[1]
     P_pi = np.zeros((S, S))
@@ -49,7 +51,7 @@ def GetPolicyDynamics(R, P, pi):
     return P_pi, R_pi
 
 #------------------------------------------------------------------------------------------------------------~
-def PolicyEvaluation(R, P, pi, gamma, P_pi=None, R_pi=None):
+def PolicyEvaluation(P, R, pi, gamma, P_pi=None, R_pi=None):
     """
     Calculates the value-function for a given policy pi and a known model
 
@@ -64,10 +66,12 @@ def PolicyEvaluation(R, P, pi, gamma, P_pi=None, R_pi=None):
     Q_pi [S x A] The Q-function for a fixed policy pi, i,e. the the expected discounted return when following pi starting from some state and action
     """
     # (1) Use PolicyDynamics to get P and R, (2) V = (I-gamma*P)^-1 * R
+    if P.ndim != 3 or R.ndim != 2 or pi.ndim != 2:
+        raise ValueError('Invalid input')
     S = P.shape[0]
     A = P.shape[1]
     if P_pi is None or R_pi is None:
-        P_pi, R_pi = GetPolicyDynamics(R, P, pi)
+        P_pi, R_pi = GetPolicyDynamics(P, R, pi)
     V_pi = np.linalg.solve((np.eye(S) - gamma * P_pi), R_pi)
     # Verify that R_pi + gamma * np.matmul(P_pi,  V_pi) == V_pi
     Q_pi = np.zeros((S, A))
@@ -104,7 +108,7 @@ def PolicyIteration(P, R, gamma):
     iter = 0
     while np.any(pi != pi_prev):
         pi_prev = pi
-        _, Q_pi = PolicyEvaluation(R, P, pi, gamma)
+        _, Q_pi = PolicyEvaluation(P, R, pi, gamma)
         # Policy improvment:
         pi = np.zeros((S, A))
         pi[np.arange(S), np.argmax(Q_pi, axis=1)] = 1  #  set 1 for the optimal action w.r.t Q, and 0 for the other actions
