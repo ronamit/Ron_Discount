@@ -58,7 +58,7 @@ def SampleTrajectories(P, R, pi, n, depth, p0=None, reward_std=0.1):
             # Until t==depth, sample a~pi(.|s), s'~P(.|s,a), r~R(s,a)
             a = np.random.choice(A, size=1, p=pi[s, :])[0]
             s_next = np.random.choice(S, size=1, p=P[s, a, :])[0]
-            r = R[s,a]+ np.random.randn(1)[0] * reward_std
+            r = R[s,a] + np.random.randn(1)[0] * reward_std
             data[i_traj].append((s,a,r,s_next))
             s = s_next
     return data

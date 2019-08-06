@@ -12,7 +12,7 @@ k = 5  #  Number of non-zero entries in each row  of transition-matrix
 reward_std = 0.1
 gammaEval = 0.99
 
-n = 2  # number of trajectories to generate
+n = 5  # number of trajectories to generate
 depth = 10  # Length of trajectory
 
 n_reps = 1000  # number of experiment repetitions
@@ -25,6 +25,7 @@ n_gammas = gamma_grid.shape[0]
 
 train_loss = np.zeros((n_gammas, n_reps))
 test_loss = np.zeros((n_gammas, n_reps))
+planing_loss = np.zeros((n_gammas, n_reps))
 
 for i_rep in range(n_reps):
     # Generate MDP:
@@ -50,15 +51,13 @@ for i_rep in range(n_reps):
         V_CE_train, _ = PolicyEvaluation(P_est, R_est, pi_CE, gammaEval)
         V_CE_test, _ = PolicyEvaluation(P, R, pi_CE, gammaEval)
 
-        # planLoss = np.sqrt(np. square(V_opt - V_CE).mean())
         test_loss[i_gamma, i_rep] = -V_CE_test.mean()
-        # print('Test loss: ', test_loss, '  gamma_guidance: ', gamma_guidance)
         train_loss[i_gamma, i_rep] = -V_CE_train.mean()
-        # print('Train loss: ', train_loss, '  gamma_guidance: ', gamma_guidance)
-        # print('Gap: ', test_loss - train_loss, '  gamma_guidance: ', gamma_guidance)
+        planing_loss[i_gamma, i_rep] = (np.abs(V_opt - V_CE_test)).mean() # (eq. 14 in Jiang, corrected to have abs)
+
+ci_factor = 1.96/np.sqrt(n_reps)  # 95% confidence interval factor
 
 plt.figure()
-ci_factor = 1.96/np.sqrt(n_reps)  # 95% confidence interval factor
 plt.errorbar(gamma_grid, train_loss.mean(axis=1), yerr=train_loss.std(axis=1) * ci_factor , fmt='g.', label='Train Loss')
 plt.errorbar(gamma_grid, test_loss.mean(axis=1), yerr=test_loss.std(axis=1) * ci_factor, fmt='b.',  label='Test Loss')
 plt.title('CE Policy Loss, #trajectories={}\n (+- 95% confidence interval)'.format(n))
@@ -66,5 +65,16 @@ plt.grid(True)
 plt.xlabel('Guidance Discount Factor')
 plt.ylabel('Minus Avg. Value')
 plt.legend()
+
+plt.figure()
+ci_factor = 1.96/np.sqrt(n_reps)  # 95% confidence interval factor
+plt.errorbar(gamma_grid, planing_loss.mean(axis=1), yerr=planing_loss.std(axis=1) * ci_factor,
+             fmt='b.', label='{} trajectories'.format(n))
+plt.title('Planing Loss, \n (+- 95% confidence interval)')
+plt.grid(True)
+plt.xlabel('Guidance Discount Factor')
+plt.ylabel('Planing Loss')
+plt.legend()
+
 plt.show()
 print('done')
