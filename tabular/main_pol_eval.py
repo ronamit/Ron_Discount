@@ -22,7 +22,9 @@ n_reps = 100  # number of experiment repetitions
 
 
 method = 'TD-Learning'  #  'Model-Based' | 'TD-Learning'
-do_correction = True
+do_correction = True  # False | True
+
+n_TD_iter = 10000
 
 ##############  Policy Evaluation   ##################
 # * Use 2 methods for estimation:
@@ -63,11 +65,12 @@ for i_rep in range(n_reps):
             V_est, Q_est = PolicyEvaluation(P_est, R_est, pi, gamma_guidance)
 
         elif method == 'TD-Learning':
-            V_est = TD_policy_evaluation(data, S, A, gamma_guidance)
+            V_est = TD_policy_evaluation(data, S, A, gamma_guidance, n_TD_iter)
 
         if do_correction:
             # Correction factor:
             V_est = V_est * (1 / (1-gammaEval)) / (1 / (1-gamma_guidance))
+            # V_est = V_est * gammaEval / gamma_guidance
 
        # Evaluate performance of estimated value:
         evaluation_loss[i_gamma, i_rep] = np. abs(V_pi - V_est).mean()
@@ -78,10 +81,11 @@ plt.figure()
 ci_factor = 1.96/np.sqrt(n_reps)  # 95% confidence interval factor
 plt.errorbar(gamma_grid, evaluation_loss.mean(axis=1), yerr=evaluation_loss.std(axis=1) * ci_factor,
              fmt='b.', label='{} trajectories'.format(n))
-plt.title(method + ' - Evaluation Loss \n' r'(Average absolute estimation error of $V^{\pi}(s)$)''\n (+- 95% confidence interval)')
+plt.title('Policy Evaluation, ' + method + ', correction=' + str(do_correction) +
+          '\n' r'(Average absolute estimation error of $V^{\pi}(s)$)''\n (+- 95% confidence interval)')
 plt.grid(True)
 plt.xlabel('Guidance Discount Factor')
-plt.ylabel('Planing Loss ')
+plt.ylabel('Evaluation Loss ')
 plt.legend()
 
 plt.show()

@@ -44,7 +44,7 @@ def ModelEstimation(data, S, A):
 
 
 #------------------------------------------------------------------------------------------------------------~
-def TD_policy_evaluation(data, S, A, gamma):
+def TD_policy_evaluation(data, S, A, gamma, n_iter=1000):
     """
     Maximum-Likelihood estimation of model based on data
 
@@ -59,7 +59,6 @@ def TD_policy_evaluation(data, S, A, gamma):
     V_pi: [S] The estimated value-function for a fixed policy pi, i,e. the the expected discounted return when following pi starting from some state
     Q_pi [S x A] The estimated Q-function for a fixed policy pi, i,e. the the expected discounted return when following pi starting from some state and action
     """
-    n_iter = 1000
     stop_diff = 1e-5
     V_pi = np.zeros((S))
     # Join list of data tuples from all trajectories:
